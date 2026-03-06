@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Decodificador de Voos</title>
+<link rel="icon" type="image/png" href="favicon.png">
+
+<style>
+:root{
+  --bg-start:#f7f9fc;
+  --bg-end:#dbeafe;
+  --primary:#1e3a8a;
+  --secondary:#5a3e87;
+  --accent:#2563eb;
+  --white:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e5e7eb;
+  --row-alt:#f3f4f6;
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(1200px 600px at 15% 10%, rgba(242, 242, 243, 0.801), transparent 80%),
+    radial-gradient(900px 500px at 85% 20%, rgba(162, 186, 238, 0.658), transparent 75%),
+    linear-gradient(135deg, var(--bg-start), var(--bg-end));
+  font-family:"Segoe UI", Arial, sans-serif;
+  color:var(--text);
+  padding: 28px 18px;
+}
+
+.container{
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== TOPO ===== */
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom: 16px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.logo-emoji{
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  /* fundo mais claro */
+  background: linear-gradient(
+    135deg,
+    rgba(37, 100, 235, 0.075),
+    rgba(161, 144, 189, 0.25)
+  );
+
+  color: var(--primary);
+  box-shadow: 0 6px 14px rgba(30,58,138,.18);
+  font-size: 22px;
+}
+
+.brand-text h1{
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.brand-text .subtitle{
+  margin: 4px 0 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--secondary);
+  text-transform: uppercase;
+}
+
+.badge{
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(30,58,138,.18);
+  background: rgba(255,255,255,.6);
+  backdrop-filter: blur(6px);
+  color: var(--primary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ===== CARD ===== */
+.card{
+  background: rgba(255,255,255,.95);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(2,6,23,.10);
+  overflow:hidden;
+}
+
+.card-header{
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header .hint{
+  margin: 6px 0 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.main{
+  padding: 16px;
+}
+
+/* ===== INPUT ===== */
+textarea{
+  width:100%;
+  height: 170px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  outline: none;
+  background: var(--white);
+  font-size: 14px;
+  resize: vertical;
+}
+
+textarea:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(37,99,235,.14);
+}
+
+/* ===== BOTÕES ===== */
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top: 12px;
+  align-items:center;
+}
+
+.btn{
+  border: 0;
+  border-radius: 14px;
+  padding: 11px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: transform .08s ease, opacity .08s ease;
+}
+
+.btn-primary{
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(109,40,217,.18);
+}
+
+.btn-ghost{
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--primary);
+}
+
+.btn:hover{
+  transform: translateY(-1px);
+  opacity: .96;
+}
+
+.sep{
+  height:1px;
+  background: var(--border);
+  margin: 16px 0;
+}
+
+/* ===== PAINÉIS ===== */
+.grid{
+  display: block;
+}
+
+.grid > *{
+  margin-bottom: 16px;
+}
+
+@media (min-width: 980px){
+  .grid{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.panel{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px;
+  overflow-x:auto;
+}
+
+.panel-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 8px;
+}
+
+.panel-title h3{
+  margin:0;
+  font-size: 13px;
+  color: var(--primary);
+}
+
+/* ===== TABELA ===== */
+.tabela-voos{
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tabela-voos th, .tabela-voos td{
+  padding: 9px 10px;
+  font-size: 13px;
+  text-align: center;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.tabela-voos th{
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.tabela-voos td{
+  color: #1e3a8a;
+}
+
+.tabela-voos tbody tr:nth-child(even){
+  background: var(--row-alt);
+}
+
+.footer{
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- TOPO -->
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo-emoji">✈️</div>
+        <div class="brand-text">
+          <h1>CONVERSOR DE VOOS OFFLINE</h1>
+          <p class="subtitle">SOMENTE FORMATO SABRE</p>
+        </div>
+      </div>
+      <div class="badge">Decodifique seus voos em formato de tabela</div>
+    </div>
+
+    <!-- CARD -->
+    <div class="card">
+      <div class="card-header">
+        <strong style="color:var(--primary)">Cole seus trechos abaixo</strong>
+        <p class="hint">Após converter, use os botões para copiar a tabela em Português ou Inglês.</p>
+      </div>
+
+      <div class="main">
+        <textarea id="entrada" placeholder="COLE OS TRECHOS AQUI"></textarea>
+
+        <div class="actions">
+          <button class="btn btn-primary" onclick="converter()">Converter</button>
+
+          <!-- Botões aparecem após converter -->
+          <div id="acoes" style="display:none;">
+            <button class="btn btn-ghost" onclick="copiarTabelaEmail('PT')">Copiar em português</button>
+            <button class="btn btn-ghost" onclick="copiarTabelaEmail('EN')">Copiar em inglês</button>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="panel">
+  <div class="panel-title">
+    <h3 id="tituloPT" style="display:none;">Português</h3>
+
+    <!-- Botão copiar PT -->
+    <button
+      id="btnCopiarPT"
+      class="btn btn-primary"
+      style="display:none; padding:8px 14px; font-size:13px;"
+      onclick="copiarTabelaEmail('PT')"
+    >
+      Copiar em português
+    </button>
+  </div>
+
+  <div id="saidaPT"></div>
+</div>
+
+          <div class="panel">
+  <div class="panel-title">
+    <h3 id="tituloEN" style="display:none;">Inglês</h3>
+
+    <!-- Botão copiar EN -->
+    <button
+      id="btnCopiarEN"
+      class="btn btn-primary"
+      style="display:none; padding:8px 14px; font-size:13px;"
+      onclick="copiarTabelaEmail('EN')"
+    >
+      Copiar em inglês
+    </button>
+  </div>
+
+  <div id="saidaEN"></div>
+</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      O conversor ainda está em desenvolvimento e pode apresentar falhas e/ou não ler todos os aeroportos e cias aéreas. Se isso acontecer, comunique a equipe de criação ✈️💁🏻‍♀️
+    </div>
+
+  </div>
+
+  <!-- Bases -->
+  <script src="aeroportos.js"></script>
+  <script src="companhias.js"></script>
+
+  <!-- Lógica -->
+  <script src="script.js"></script>
+</body>
+</html>
