@@ -61,14 +61,11 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-
-  /* fundo mais claro */
   background: linear-gradient(
     135deg,
     rgba(37, 100, 235, 0.075),
     rgba(161, 144, 189, 0.25)
   );
-
   color: var(--primary);
   box-shadow: 0 6px 14px rgba(30,58,138,.18);
   font-size: 22px;
@@ -257,13 +254,36 @@ textarea:focus{
   font-size: 12px;
   text-align: center;
 }
+
+/* ===== TOAST ===== */
+.toast{
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(30,58,138,0.25);
+  font-size: 14px;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.toast.show{
+  opacity: 1;
+  transform: translateY(0);
+}
 </style>
 </head>
 
 <body>
   <div class="container">
 
-    <!-- TOPO -->
     <div class="topbar">
       <div class="brand">
         <div class="logo-emoji">✈️</div>
@@ -275,7 +295,6 @@ textarea:focus{
       <div class="badge">Decodifique seus voos em formato de tabela</div>
     </div>
 
-    <!-- CARD -->
     <div class="card">
       <div class="card-header">
         <strong style="color:var(--primary)">Cole seus trechos abaixo</strong>
@@ -288,7 +307,6 @@ textarea:focus{
         <div class="actions">
           <button class="btn btn-primary" onclick="converter()">Converter</button>
 
-          <!-- Botões aparecem após converter -->
           <div id="acoes" style="display:none;">
             <button class="btn btn-ghost" onclick="copiarTabelaEmail('PT')">Copiar em português</button>
             <button class="btn btn-ghost" onclick="copiarTabelaEmail('EN')">Copiar em inglês</button>
@@ -298,40 +316,37 @@ textarea:focus{
         <div class="sep"></div>
 
         <div class="panel">
-  <div class="panel-title">
-    <h3 id="tituloPT" style="display:none;">Português</h3>
+          <div class="panel-title">
+            <h3 id="tituloPT" style="display:none;">Português</h3>
 
-    <!-- Botão copiar PT -->
-    <button
-      id="btnCopiarPT"
-      class="btn btn-primary"
-      style="display:none; padding:8px 14px; font-size:13px;"
-      onclick="copiarTabelaEmail('PT')"
-    >
-      Copiar em português
-    </button>
-  </div>
+            <button
+              id="btnCopiarPT"
+              class="btn btn-primary"
+              style="display:none; padding:8px 14px; font-size:13px;"
+              onclick="copiarTabelaEmail('PT')"
+            >
+              Copiar em português
+            </button>
+          </div>
 
-  <div id="saidaPT"></div>
-</div>
+          <div id="saidaPT"></div>
+        </div>
 
-          <div class="panel">
-  <div class="panel-title">
-    <h3 id="tituloEN" style="display:none;">Inglês</h3>
+        <div class="panel">
+          <div class="panel-title">
+            <h3 id="tituloEN" style="display:none;">Inglês</h3>
 
-    <!-- Botão copiar EN -->
-    <button
-      id="btnCopiarEN"
-      class="btn btn-primary"
-      style="display:none; padding:8px 14px; font-size:13px;"
-      onclick="copiarTabelaEmail('EN')"
-    >
-      Copiar em inglês
-    </button>
-  </div>
+            <button
+              id="btnCopiarEN"
+              class="btn btn-primary"
+              style="display:none; padding:8px 14px; font-size:13px;"
+              onclick="copiarTabelaEmail('EN')"
+            >
+              Copiar em inglês
+            </button>
+          </div>
 
-  <div id="saidaEN"></div>
-</div>
+          <div id="saidaEN"></div>
         </div>
       </div>
     </div>
@@ -342,11 +357,10 @@ textarea:focus{
 
   </div>
 
-  <!-- Bases -->
+  <div id="toast" class="toast"></div>
+
   <script src="aeroportos.js"></script>
   <script src="companhias.js"></script>
-
-  <!-- Lógica -->
   <script src="script.js"></script>
 </body>
 </html>

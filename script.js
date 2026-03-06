@@ -14,13 +14,11 @@ function converter() {
     const partes = linha.split(/\s+/);
     let i = 0;
 
-    // número do segmento
     i++;
 
     let companhia = "";
     let voo = "";
 
-    // casos: LA8126L  OU  UA 63W
     if (/^[A-Z0-9]{2}\d+/i.test(partes[i])) {
       const completo = partes[i];
       companhia = completo.substring(0, 2).toUpperCase();
@@ -35,7 +33,6 @@ function converter() {
     const dataSaida = partes[i] || "";
     i++;
 
-    // pula dia da semana
     i++;
 
     const rotaComPossivelStatus = partes[i] || "";
@@ -45,7 +42,6 @@ function converter() {
     const origem = rota.substring(0, 3).toUpperCase();
     const destino = rota.substring(3, 6).toUpperCase();
 
-    // status separado
     if (partes[i] && /^[\*\-]?(SS|HK)\d+/i.test(partes[i])) {
       i++;
     }
@@ -56,7 +52,6 @@ function converter() {
     const horaChegada = partes[i] || "";
     i++;
 
-    // data chegada automática
     let dataChegada = dataSaida;
     if (partes[i] && /^[0-9]{2}[A-Z]{3}$/i.test(partes[i])) {
       dataChegada = partes[i];
@@ -76,14 +71,13 @@ function converter() {
 
   gerarTabelas(voos);
 
-  // MOSTRA botões e títulos só depois da conversão (se houver resultado)
   const mostrar = voos.length > 0;
 
-document.getElementById("tituloPT").style.display = mostrar ? "block" : "none";
-document.getElementById("tituloEN").style.display = mostrar ? "block" : "none";
+  document.getElementById("tituloPT").style.display = mostrar ? "block" : "none";
+  document.getElementById("tituloEN").style.display = mostrar ? "block" : "none";
 
-document.getElementById("btnCopiarPT").style.display = mostrar ? "inline-block" : "none";
-document.getElementById("btnCopiarEN").style.display = mostrar ? "inline-block" : "none";
+  document.getElementById("btnCopiarPT").style.display = mostrar ? "inline-block" : "none";
+  document.getElementById("btnCopiarEN").style.display = mostrar ? "inline-block" : "none";
 }
 
 /* ===== helpers ===== */
@@ -131,11 +125,22 @@ function formatarDataPT(data) {
   return dia + (mapaMes[mes] || mes);
 }
 
+function mostrarToast(mensagem) {
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+
+  toast.textContent = mensagem;
+  toast.classList.add("show");
+
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
+
 /* ===== Tabelas ===== */
 
 function gerarTabelas(voos) {
-
-  // PT
   let htmlPT = `
 <table class="tabela-voos">
 <tr>
@@ -169,7 +174,6 @@ function gerarTabelas(voos) {
   htmlPT += `</tbody></table>`;
   document.getElementById("saidaPT").innerHTML = htmlPT;
 
-  // EN
   let htmlEN = `
 <table class="tabela-voos">
 <tr>
@@ -204,24 +208,23 @@ function gerarTabelas(voos) {
   document.getElementById("saidaEN").innerHTML = htmlEN;
 }
 
-/* ===== Copiar para e-mail (PT ou EN) com as cores do site ===== */
+/* ===== Copiar para e-mail ===== */
 
 function copiarTabelaEmail(idioma) {
   const selector = idioma === "EN" ? "#saidaEN table" : "#saidaPT table";
   const tabela = document.querySelector(selector);
 
   if (!tabela) {
-    alert("Gere a tabela primeiro.");
+    mostrarToast("Gere a tabela primeiro.");
     return;
   }
 
-  // Cores do NOVO tema (azul/roxo/branco)
-  const headerBg = "#1e3a8a";   // azul escuro (cabeçalho)
-  const headerText = "#ffffff"; // branco
-  const borderColor = "#e5e7eb"; // cinza claro (borda)
-  const zebraBg = "#f3f4f6";     // cinza claro alternado
-  const textColor = "#1e3a8a";   // azul escuro (texto)
-  const bodyBg = "#ffffff";      // branco
+  const headerBg = "#1e3a8a";
+  const headerText = "#ffffff";
+  const borderColor = "#e5e7eb";
+  const zebraBg = "#f3f4f6";
+  const textColor = "#1e3a8a";
+  const bodyBg = "#ffffff";
 
   const estilos = `
     <style>
@@ -254,24 +257,11 @@ function copiarTabelaEmail(idioma) {
       table.tabela-voos tbody tr:nth-child(even){
         background: ${zebraBg};
       }
-        .logo-emoji{
-        font-size: 32px;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: #ffffff;
-        box-shadow: 0 4px 12px rgba(30,58,138,0.35);
-}
     </style>
   `;
 
   const html = `<!DOCTYPE html><html><head>${estilos}</head><body>${tabela.outerHTML}</body></html>`;
 
-  // Copia HTML + fallback texto
   if (navigator.clipboard && window.ClipboardItem) {
     const item = new ClipboardItem({
       "text/html": new Blob([html], { type: "text/html" }),
@@ -279,16 +269,92 @@ function copiarTabelaEmail(idioma) {
     });
 
     navigator.clipboard.write([item])
-      .then(() => alert("Tabela copiada!"))
+      .then(() => {
+        mostrarToast("Tabela copiada!");
+      })
       .catch(() => {
-        navigator.clipboard.writeText(tabela.innerText);
-        alert("Copiado como texto (o app pode não aceitar formatação).");
+        navigator.clipboard.writeText(tabela.innerText)
+          .then(() => mostrarToast("Copiado como texto."))
+          .catch(() => mostrarToast("Não foi possível copiar."));
       });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(tabela.innerText)
+      .then(() => mostrarToast("Copiado como texto."))
+      .catch(() => mostrarToast("Não foi possível copiar."));
   } else {
-    navigator.clipboard.writeText(tabela.innerText);
-    alert("Copiado como texto (navegador não suporta HTML no copiar).");
+    mostrarToast("Seu navegador não suporta cópia automática.");
+  }
+}
+
+function copiarTabelaDireta(tabela) {
+  if (!tabela) {
+    mostrarToast("Nenhuma tabela para copiar.");
+    return;
   }
 
+  const headerBg = "#1e3a8a";
+  const headerText = "#ffffff";
+  const borderColor = "#e5e7eb";
+  const zebraBg = "#f3f4f6";
+  const textColor = "#1e3a8a";
+  const bodyBg = "#ffffff";
+
+  const estilos = `
+    <style>
+      table.tabela-voos{
+        width: 100%;
+        max-width: 1000px;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: ${bodyBg};
+        border: 1px solid ${borderColor};
+        border-radius: 10px;
+        overflow: hidden;
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-size: 13px;
+        color: ${textColor};
+      }
+      table.tabela-voos th{
+        background: ${headerBg};
+        color: ${headerText};
+        font-weight: 700;
+        text-align: center;
+        padding: 10px 12px;
+      }
+      table.tabela-voos td{
+        text-align: center;
+        padding: 10px 12px;
+        border-top: 1px solid ${borderColor};
+        color: ${textColor};
+      }
+      table.tabela-voos tbody tr:nth-child(even){
+        background: ${zebraBg};
+      }
+    </style>
+  `;
+
+  const html = `<!DOCTYPE html><html><head>${estilos}</head><body>${tabela.outerHTML}</body></html>`;
+
+  if (navigator.clipboard && window.ClipboardItem) {
+    const item = new ClipboardItem({
+      "text/html": new Blob([html], { type: "text/html" }),
+      "text/plain": new Blob([tabela.innerText], { type: "text/plain" })
+    });
+
+    navigator.clipboard.write([item])
+      .then(() => mostrarToast("Tabela copiada!"))
+      .catch(() => {
+        navigator.clipboard.writeText(tabela.innerText)
+          .then(() => mostrarToast("Copiado como texto."))
+          .catch(() => mostrarToast("Não foi possível copiar."));
+      });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(tabela.innerText)
+      .then(() => mostrarToast("Copiado como texto."))
+      .catch(() => mostrarToast("Não foi possível copiar."));
+  } else {
+    mostrarToast("Seu navegador não suporta cópia automática.");
+  }
 }
 
 /* ===== Atalho teclado ===== */
@@ -296,13 +362,56 @@ function copiarTabelaEmail(idioma) {
 window.addEventListener("DOMContentLoaded", () => {
   const entrada = document.getElementById("entrada");
 
-  if (!entrada) return;
+  if (entrada) {
+    entrada.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.ctrlKey) {
+        e.preventDefault();
+        converter();
+      }
+    });
+  }
 
-  entrada.addEventListener("keydown", (e) => {
-    // Ctrl + Enter converte
-    if (e.key === "Enter" && e.ctrlKey) {
+  document.addEventListener("keydown", (e) => {
+    const teclaC = e.key.toLowerCase() === "c";
+    const ctrlOuCmd = e.ctrlKey || e.metaKey;
+
+    if (!ctrlOuCmd || !teclaC) return;
+
+    const ativo = document.activeElement;
+    const emCampoEditavel =
+      ativo &&
+      (ativo.tagName === "TEXTAREA" ||
+       ativo.tagName === "INPUT" ||
+       ativo.isContentEditable);
+
+    // mantém Ctrl+C normal no textarea/input
+    if (emCampoEditavel) return;
+
+    const selecao = window.getSelection();
+    if (!selecao || selecao.rangeCount === 0) return;
+
+    const noSelecionado = selecao.anchorNode;
+    if (!noSelecionado) return;
+
+    const elemento =
+      noSelecionado.nodeType === 1
+        ? noSelecionado
+        : noSelecionado.parentElement;
+
+    if (!elemento) return;
+
+    const tabelaPT = elemento.closest("#saidaPT table");
+    const tabelaEN = elemento.closest("#saidaEN table");
+
+    if (tabelaPT) {
       e.preventDefault();
-      converter();
+      copiarTabelaDireta(tabelaPT);
+      return;
+    }
+
+    if (tabelaEN) {
+      e.preventDefault();
+      copiarTabelaDireta(tabelaEN);
     }
   });
 });
