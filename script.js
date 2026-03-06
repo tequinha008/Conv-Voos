@@ -219,11 +219,11 @@ function copiarTabelaEmail(idioma) {
     return;
   }
 
-  const headerBg = "#1e3a8a";
+  const headerBg = "#3a4255";
   const headerText = "#ffffff";
   const borderColor = "#e5e7eb";
   const zebraBg = "#f3f4f6";
-  const textColor = "#1e3a8a";
+  const textColor = "#000923";
   const bodyBg = "#ffffff";
 
   const estilos = `
@@ -292,11 +292,11 @@ function copiarTabelaDireta(tabela) {
     return;
   }
 
-  const headerBg = "#1e3a8a";
+  const headerBg = "#3a4255";
   const headerText = "#ffffff";
   const borderColor = "#e5e7eb";
   const zebraBg = "#f3f4f6";
-  const textColor = "#1e3a8a";
+  const textColor = "#000923";
   const bodyBg = "#ffffff";
 
   const estilos = `
