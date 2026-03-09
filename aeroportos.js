@@ -112,6 +112,7 @@ const aeroportos = {
   CUZ: "Cusco",
   MDZ: "Mendoza",
   SJO: "San José",
+  PTY: "Panama City – Tocumen",
   
   // --- Europa ---
   MAD: "Madrid",
