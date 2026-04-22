@@ -160,6 +160,7 @@ const aeroportos = {
   ARN: "Stockholm – Arlanda",
   LYS: "Lyon",
   BGI: "Bridgetown - Barbados",
+  VLC: "Valencia",
   
   // --- Oriente Médio / África ---
   IST: "Istanbul",
