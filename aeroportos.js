@@ -21,6 +21,7 @@ const aeroportos = {
   AJU: "Aracaju",
   MCZ: "Maceió",
   JPA: "João Pessoa",
+  GYN: "Goiânia",
 
   // --- EUA (hubs + destinos comuns) ---
   JFK: "New York – JFK",
@@ -157,6 +158,8 @@ const aeroportos = {
   HAM: "Hamburg",
   NAP: "Naples",
   ARN: "Stockholm – Arlanda",
+  LYS: "Lyon",
+  BGI: "Bridgetown - Barbados",
   
   // --- Oriente Médio / África ---
   IST: "Istanbul",
