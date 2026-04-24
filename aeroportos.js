@@ -161,6 +161,7 @@ const aeroportos = {
   LYS: "Lyon",
   BGI: "Bridgetown - Barbados",
   VLC: "Valencia",
+  SVQ: "Sevilla - Espanha",
   
   // --- Oriente Médio / África ---
   IST: "Istanbul",
