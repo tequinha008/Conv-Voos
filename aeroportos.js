@@ -96,6 +96,7 @@ const aeroportos = {
   SJO: "San José",
   HAV: "Havana",
   SNU: "Santa Clara",
+  OAX: "Oaxaca - México",
 
   // --- América do Sul ---
   SCL: "Santiago",
