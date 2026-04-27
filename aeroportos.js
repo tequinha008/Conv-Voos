@@ -114,6 +114,7 @@ const aeroportos = {
   MDZ: "Mendoza",
   SJO: "San José",
   PTY: "Panama City – Tocumen",
+  BIL: "Billings - Montana",
   
   // --- Europa ---
   MAD: "Madrid",
