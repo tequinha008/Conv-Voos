@@ -11,62 +11,14 @@ function converter() {
   for (let linha of linhas) {
     if (!/^\d+/.test(linha)) continue;
 
-    const partes = linha.split(/\s+/);
-    let i = 0;
+    const vooAmadeus = processarAmadeus(linha);
+    const vooSabre = vooAmadeus ? null : processarSabre(linha);
 
-    i++;
+    const vooFinal = vooAmadeus || vooSabre;
 
-    let companhia = "";
-    let voo = "";
-
-    if (/^[A-Z0-9]{2}\d+/i.test(partes[i])) {
-      const completo = partes[i];
-      companhia = completo.substring(0, 2).toUpperCase();
-      voo = completo.substring(2).replace(/[A-Z]$/i, "");
-      i++;
-    } else {
-      companhia = (partes[i] || "").toUpperCase();
-      voo = (partes[i + 1] || "").replace(/[A-Z]$/i, "");
-      i += 2;
+    if (vooFinal) {
+      voos.push(vooFinal);
     }
-
-    const dataSaida = partes[i] || "";
-    i++;
-
-    i++;
-
-    const rotaComPossivelStatus = partes[i] || "";
-    i++;
-
-    const rota = rotaComPossivelStatus.replace(/[^A-Z]/gi, "");
-    const origem = rota.substring(0, 3).toUpperCase();
-    const destino = rota.substring(3, 6).toUpperCase();
-
-    if (partes[i] && /^[\*\-]?(SS|HK)\d+/i.test(partes[i])) {
-      i++;
-    }
-
-    const horaSaida = partes[i] || "";
-    i++;
-
-    const horaChegada = partes[i] || "";
-    i++;
-
-    let dataChegada = dataSaida;
-    if (partes[i] && /^[0-9]{2}[A-Z]{3}$/i.test(partes[i])) {
-      dataChegada = partes[i];
-    }
-
-    voos.push({
-      companhia,
-      voo,
-      origem,
-      destino,
-      horaSaida,
-      dataSaida,
-      horaChegada,
-      dataChegada
-    });
   }
 
   gerarTabelas(voos);
@@ -78,6 +30,146 @@ function converter() {
 
   document.getElementById("btnCopiarPT").style.display = mostrar ? "inline-block" : "none";
   document.getElementById("btnCopiarEN").style.display = mostrar ? "inline-block" : "none";
+}
+
+/* ===== PROCESSADOR SABRE ===== */
+
+function processarSabre(linha) {
+  const partes = linha.split(/\s+/);
+  let i = 0;
+
+  i++;
+
+  let companhia = "";
+  let voo = "";
+
+  if (/^[A-Z0-9]{2}\d+/i.test(partes[i])) {
+    const completo = partes[i];
+    companhia = completo.substring(0, 2).toUpperCase();
+    voo = completo.substring(2).replace(/[A-Z]$/i, "");
+    i++;
+  } else {
+    companhia = (partes[i] || "").toUpperCase();
+    voo = (partes[i + 1] || "").replace(/[A-Z]$/i, "");
+    i += 2;
+  }
+
+  const dataSaida = partes[i] || "";
+  i++;
+
+  i++;
+
+  const rotaComPossivelStatus = partes[i] || "";
+  i++;
+
+  const rota = rotaComPossivelStatus.replace(/[^A-Z]/gi, "");
+  const origem = rota.substring(0, 3).toUpperCase();
+  const destino = rota.substring(3, 6).toUpperCase();
+
+  if (!origem || !destino) return null;
+
+  if (partes[i] && /^[\*\-]?(SS|HK|TK|DK|HN|HL)\d+/i.test(partes[i])) {
+    i++;
+  }
+
+  const horaSaida = partes[i] || "";
+  i++;
+
+  const horaChegada = partes[i] || "";
+  i++;
+
+  let dataChegada = dataSaida;
+  if (partes[i] && /^[0-9]{2}[A-Z]{3}$/i.test(partes[i])) {
+    dataChegada = partes[i];
+  }
+
+  return {
+    companhia,
+    voo,
+    origem,
+    destino,
+    horaSaida,
+    dataSaida,
+    horaChegada,
+    dataChegada
+  };
+}
+
+/* ===== PROCESSADOR AMADEUS ===== */
+
+function processarAmadeus(linha) {
+  const partes = linha.split(/\s+/);
+  let i = 0;
+
+  i++;
+
+  let companhia = "";
+  let voo = "";
+
+  if (/^[A-Z0-9]{2}\d+$/i.test(partes[i])) {
+    const completo = partes[i];
+    companhia = completo.substring(0, 2).toUpperCase();
+    voo = completo.substring(2);
+    i++;
+  } else {
+    companhia = (partes[i] || "").toUpperCase();
+    voo = (partes[i + 1] || "").replace(/[A-Z]$/i, "");
+    i += 2;
+  }
+
+  if (!companhia || !voo) return null;
+
+  if (partes[i] && /^[A-Z]$/i.test(partes[i])) {
+    i++;
+  } else {
+    return null;
+  }
+
+  const dataSaida = partes[i] || "";
+  if (!/^[0-9]{2}[A-Z]{3}$/i.test(dataSaida)) return null;
+  i++;
+
+  let rotaToken = partes[i] || "";
+
+  if (!/[A-Z]{6}/i.test(rotaToken) && partes[i + 1]) {
+    i++;
+    rotaToken = partes[i] || "";
+  }
+
+  i++;
+
+  const rota = rotaToken.replace(/[^A-Z]/gi, "");
+  const origem = rota.substring(0, 3).toUpperCase();
+  const destino = rota.substring(3, 6).toUpperCase();
+
+  if (!origem || !destino) return null;
+
+  if (partes[i] && /^[A-Z]{2}\d+/i.test(partes[i])) {
+    i++;
+  }
+
+  const horaSaida = partes[i] || "";
+  i++;
+
+  const horaChegada = partes[i] || "";
+  i++;
+
+  let dataChegada = dataSaida;
+
+  if (partes[i] && /^[0-9]{2}[A-Z]{3}$/i.test(partes[i])) {
+    dataChegada = partes[i];
+  }
+
+  return {
+    companhia,
+    voo,
+    origem,
+    destino,
+    horaSaida,
+    dataSaida,
+    horaChegada,
+    dataChegada
+  };
 }
 
 /* ===== helpers ===== */
@@ -219,71 +311,7 @@ function copiarTabelaEmail(idioma) {
     return;
   }
 
-  const headerBg = "#3a4255";
-  const headerText = "#ffffff";
-  const borderColor = "#e5e7eb";
-  const zebraBg = "#f3f4f6";
-  const textColor = "#000923";
-  const bodyBg = "#ffffff";
-
-  const estilos = `
-    <style>
-      table.tabela-voos{
-        width: 100%;
-        max-width: 1000px;
-        border-collapse: separate;
-        border-spacing: 0;
-        background: ${bodyBg};
-        border: 1px solid ${borderColor};
-        border-radius: 10px;
-        overflow: hidden;
-        font-family: "Segoe UI", Arial, sans-serif;
-        font-size: 13px;
-        color: ${textColor};
-      }
-      table.tabela-voos th{
-        background: ${headerBg};
-        color: ${headerText};
-        font-weight: 700;
-        text-align: center;
-        padding: 10px 12px;
-      }
-      table.tabela-voos td{
-        text-align: center;
-        padding: 10px 12px;
-        border-top: 1px solid ${borderColor};
-        color: ${textColor};
-      }
-      table.tabela-voos tbody tr:nth-child(even){
-        background: ${zebraBg};
-      }
-    </style>
-  `;
-
-  const html = `<!DOCTYPE html><html><head>${estilos}</head><body>${tabela.outerHTML}</body></html>`;
-
-  if (navigator.clipboard && window.ClipboardItem) {
-    const item = new ClipboardItem({
-      "text/html": new Blob([html], { type: "text/html" }),
-      "text/plain": new Blob([tabela.innerText], { type: "text/plain" })
-    });
-
-    navigator.clipboard.write([item])
-      .then(() => {
-        mostrarToast("Tabela copiada!");
-      })
-      .catch(() => {
-        navigator.clipboard.writeText(tabela.innerText)
-          .then(() => mostrarToast("Copiado como texto."))
-          .catch(() => mostrarToast("Não foi possível copiar."));
-      });
-  } else if (navigator.clipboard) {
-    navigator.clipboard.writeText(tabela.innerText)
-      .then(() => mostrarToast("Copiado como texto."))
-      .catch(() => mostrarToast("Não foi possível copiar."));
-  } else {
-    mostrarToast("Seu navegador não suporta cópia automática.");
-  }
+  copiarTabelaDireta(tabela);
 }
 
 function copiarTabelaDireta(tabela) {
@@ -384,7 +412,6 @@ window.addEventListener("DOMContentLoaded", () => {
        ativo.tagName === "INPUT" ||
        ativo.isContentEditable);
 
-    // mantém Ctrl+C normal no textarea/input
     if (emCampoEditavel) return;
 
     const selecao = window.getSelection();
