@@ -483,3 +483,221 @@ function gerarTabelas(voos) {
   document.getElementById("saidaEN").innerHTML =
     htmlEN;
 }
+/* ===== COPIAR TABELA ===== */
+
+function copiarTabelaEmail(idioma) {
+
+  const selector =
+    idioma === "EN"
+      ? "#saidaEN table"
+      : "#saidaPT table";
+
+  const tabela = document.querySelector(selector);
+
+  if (!tabela) {
+    mostrarToast("Gere a tabela primeiro.");
+    return;
+  }
+
+  copiarTabelaDireta(tabela);
+}
+
+function copiarTabelaDireta(tabela) {
+
+  if (!tabela) {
+    mostrarToast("Nenhuma tabela para copiar.");
+    return;
+  }
+
+  const headerBg = "#3a4255";
+  const headerText = "#ffffff";
+  const borderColor = "#e5e7eb";
+  const zebraBg = "#f3f4f6";
+  const textColor = "#000923";
+  const bodyBg = "#ffffff";
+
+  const estilos = `
+    <style>
+      table.tabela-voos{
+        width:100%;
+        max-width:1000px;
+        border-collapse:separate;
+        border-spacing:0;
+        background:${bodyBg};
+        border:1px solid ${borderColor};
+        border-radius:10px;
+        overflow:hidden;
+        font-family:"Segoe UI", Arial, sans-serif;
+        font-size:13px;
+        color:${textColor};
+      }
+
+      table.tabela-voos th{
+        background:${headerBg};
+        color:${headerText};
+        font-weight:700;
+        text-align:center;
+        padding:10px 12px;
+      }
+
+      table.tabela-voos td{
+        text-align:center;
+        padding:10px 12px;
+        border-top:1px solid ${borderColor};
+        color:${textColor};
+      }
+
+      table.tabela-voos tbody tr:nth-child(even){
+        background:${zebraBg};
+      }
+    </style>
+  `;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>${estilos}</head>
+      <body>${tabela.outerHTML}</body>
+    </html>
+  `;
+
+  if (navigator.clipboard && window.ClipboardItem) {
+
+    const item = new ClipboardItem({
+      "text/html": new Blob(
+        [html],
+        { type: "text/html" }
+      ),
+
+      "text/plain": new Blob(
+        [tabela.innerText],
+        { type: "text/plain" }
+      )
+    });
+
+    navigator.clipboard.write([item])
+
+      .then(() => {
+        mostrarToast("Tabela copiada!");
+      })
+
+      .catch(() => {
+
+        navigator.clipboard
+          .writeText(tabela.innerText)
+
+          .then(() => {
+            mostrarToast("Copiado como texto.");
+          })
+
+          .catch(() => {
+            mostrarToast("Não foi possível copiar.");
+          });
+      });
+
+  } else if (navigator.clipboard) {
+
+    navigator.clipboard
+      .writeText(tabela.innerText)
+
+      .then(() => {
+        mostrarToast("Copiado como texto.");
+      })
+
+      .catch(() => {
+        mostrarToast("Não foi possível copiar.");
+      });
+
+  } else {
+
+    mostrarToast(
+      "Seu navegador não suporta cópia automática."
+    );
+  }
+}
+
+/* ===== CTRL + C ===== */
+
+window.addEventListener("DOMContentLoaded", () => {
+
+  const entrada = document.getElementById("entrada");
+
+  // CTRL + ENTER
+  if (entrada) {
+
+    entrada.addEventListener("keydown", (e) => {
+
+      if (e.key === "Enter" && e.ctrlKey) {
+
+        e.preventDefault();
+
+        converter();
+      }
+    });
+  }
+
+  // CTRL + C
+  document.addEventListener("keydown", (e) => {
+
+    const teclaC =
+      e.key.toLowerCase() === "c";
+
+    const ctrlOuCmd =
+      e.ctrlKey || e.metaKey;
+
+    if (!ctrlOuCmd || !teclaC) return;
+
+    const ativo = document.activeElement;
+
+    const emCampoEditavel =
+      ativo &&
+      (
+        ativo.tagName === "TEXTAREA" ||
+        ativo.tagName === "INPUT" ||
+        ativo.isContentEditable
+      );
+
+    // mantém ctrl+c normal
+    if (emCampoEditavel) return;
+
+    const selecao = window.getSelection();
+
+    if (!selecao || selecao.rangeCount === 0) {
+      return;
+    }
+
+    const noSelecionado =
+      selecao.anchorNode;
+
+    if (!noSelecionado) return;
+
+    const elemento =
+      noSelecionado.nodeType === 1
+        ? noSelecionado
+        : noSelecionado.parentElement;
+
+    if (!elemento) return;
+
+    const tabelaPT =
+      elemento.closest("#saidaPT table");
+
+    const tabelaEN =
+      elemento.closest("#saidaEN table");
+
+    if (tabelaPT) {
+
+      e.preventDefault();
+
+      copiarTabelaDireta(tabelaPT);
+
+      return;
+    }
+
+    if (tabelaEN) {
+
+      e.preventDefault();
+
+      copiarTabelaDireta(tabelaEN);
+    }
+  });
+});
