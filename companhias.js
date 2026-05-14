@@ -27,6 +27,7 @@ const companhias = {
   AR: "Aerolineas Argentinas",
   H2: "Sky Airline",
   JA: "JetSMART",
+  AM: "Aeromexico",
   
 
   // --- Europa (tradicionais) ---
@@ -47,6 +48,7 @@ const companhias = {
   A3: "Aegean Airlines",
   UX: "Air Europa",
   TK: "Turkish Airlines",
+  EN: "Air Dolomiti",
   
 
   // --- Europa (low cost) ---
