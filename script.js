@@ -51,6 +51,7 @@ function prepararLinhas(texto) {
 
     let linha = linhasOriginais[i];
 
+    // Ignorar textos desnecessários do AMADEUS
     if (
       linha.startsWith("•") ||
       linha.includes("GRUPO") ||
@@ -85,27 +86,6 @@ function prepararLinhas(texto) {
   }
 
   return linhas;
-}
-
-/* ===== LIMPAR ROTA ===== */
-
-function limparRota(token) {
-
-  return (token || "")
-
-    // remove status grudado
-    .replace(
-      /\*?(SS|HK|TK|DK|HN|HL|UC|UN|WL|HX|NO|RR)\d+/i,
-      ""
-    )
-
-    // remove tudo que não for letra
-    .replace(/[^A-Z]/gi, "")
-
-    // garante só 6 chars
-    .substring(0, 6)
-
-    .toUpperCase();
 }
 
 /* ===== SABRE ===== */
@@ -156,7 +136,8 @@ function processarSabre(linha) {
 
   i++;
 
-  const rota = limparRota(rotaComPossivelStatus);
+  const rota = rotaComPossivelStatus
+    .replace(/[^A-Z]/gi, "");
 
   const origem = rota.substring(0, 3).toUpperCase();
 
@@ -167,7 +148,7 @@ function processarSabre(linha) {
   // STATUS
   if (
     partes[i] &&
-    /^[\*\-]?(SS|HK|TK|DK|HN|HL|UC|UN|WL|HX|NO|RR)\d+/i.test(partes[i])
+    /^[\*\-]?(SS|HK|TK|DK|HN|HL|UC|UN|WL|HX|NO)\d+/i.test(partes[i])
   ) {
     i++;
   }
@@ -211,6 +192,7 @@ function processarAmadeus(linha) {
 
   if (partes.length < 6) return null;
 
+  // Remove número do segmento
   if (/^\d+$/.test(partes[0])) {
     partes.shift();
   }
@@ -262,14 +244,15 @@ function processarAmadeus(linha) {
   let origem = "";
   let destino = "";
 
-  // rota junta
+  // ROTA JUNTA
   const rotaToken = partes.find(p =>
     /[A-Z]{6}/i.test(p)
   );
 
   if (rotaToken) {
 
-    const rota = limparRota(rotaToken);
+    const rota = rotaToken
+      .replace(/[^A-Z]/gi, "");
 
     origem = rota.substring(0, 3).toUpperCase();
 
@@ -277,7 +260,7 @@ function processarAmadeus(linha) {
 
   } else {
 
-    // rota separada
+    // ROTA SEPARADA
     const indiceData = partes.findIndex(p =>
       /^[0-9]{2}[A-Z]{3}$/i.test(p)
     );
@@ -424,6 +407,82 @@ function mostrarToast(mensagem) {
   }, 2200);
 }
 
+/* ===== TABELAS ===== */
+
+function gerarTabelas(voos) {
+
+  let htmlPT = `
+<table class="tabela-voos">
+<tr>
+  <th>Cia Aérea</th>
+  <th>Voo</th>
+  <th>Data</th>
+  <th>De</th>
+  <th>Para</th>
+  <th>Hora Saída</th>
+  <th>Hora Chegada</th>
+  <th>Data Chegada</th>
+</tr>
+<tbody>
+`;
+
+  for (const v of voos) {
+
+    htmlPT += `
+<tr>
+  <td>${nomeCompanhia(v.companhia)}</td>
+  <td>${v.voo}</td>
+  <td>${formatarDataPT(v.dataSaida)}</td>
+  <td>${aeroportoB(v.origem)}</td>
+  <td>${aeroportoB(v.destino)}</td>
+  <td>${formatarHora(v.horaSaida)}</td>
+  <td>${formatarHora(v.horaChegada)}</td>
+  <td>${formatarDataPT(v.dataChegada)}</td>
+</tr>
+`;
+  }
+
+  htmlPT += `</tbody></table>`;
+
+  document.getElementById("saidaPT").innerHTML =
+    htmlPT;
+
+  let htmlEN = `
+<table class="tabela-voos">
+<tr>
+  <th>Airline</th>
+  <th>Flight</th>
+  <th>Date</th>
+  <th>From</th>
+  <th>To</th>
+  <th>Departure Time</th>
+  <th>Arrival Time</th>
+  <th>Arrival Date</th>
+</tr>
+<tbody>
+`;
+
+  for (const v of voos) {
+
+    htmlEN += `
+<tr>
+  <td>${nomeCompanhia(v.companhia)}</td>
+  <td>${v.voo}</td>
+  <td>${v.dataSaida}</td>
+  <td>${aeroportoB(v.origem)}</td>
+  <td>${aeroportoB(v.destino)}</td>
+  <td>${formatarHora(v.horaSaida)}</td>
+  <td>${formatarHora(v.horaChegada)}</td>
+  <td>${v.dataChegada}</td>
+</tr>
+`;
+  }
+
+  htmlEN += `</tbody></table>`;
+
+  document.getElementById("saidaEN").innerHTML =
+    htmlEN;
+}
 /* ===== COPIAR TABELA ===== */
 
 function copiarTabelaEmail(idioma) {
