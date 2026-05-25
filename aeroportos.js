@@ -23,6 +23,7 @@ const aeroportos = {
   JPA: "João Pessoa",
   GYN: "Goiânia",
   JJD: "Jericoacoara",
+  MGF: "Maringa",
 
   // --- EUA (hubs + destinos comuns) ---
   JFK: "New York – JFK",
