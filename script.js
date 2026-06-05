@@ -397,15 +397,12 @@ function copiarTabelaDireta(tabela) {
     <style>
       table.tabela-voos{
         width:100%;
-        max-width:1000px;
-        border-collapse:separate;
-        border-spacing:0;
+        max-width:900px;
+        border-collapse:collapse;
         background:${bodyBg};
         border:1px solid ${borderColor};
-        border-radius:10px;
-        overflow:hidden;
         font-family:"Segoe UI", Arial, sans-serif;
-        font-size:13px;
+        font-size:12px;
         color:${textColor};
       }
 
@@ -414,14 +411,17 @@ function copiarTabelaDireta(tabela) {
         color:${headerText};
         font-weight:700;
         text-align:center;
-        padding:10px 12px;
+        padding:6px 8px;
+        border:1px solid ${borderColor};
+        white-space:nowrap;
       }
 
       table.tabela-voos td{
         text-align:center;
-        padding:10px 12px;
-        border-top:1px solid ${borderColor};
+        padding:7px 8px;
+        border:1px solid ${borderColor};
         color:${textColor};
+        white-space:nowrap;
       }
 
       table.tabela-voos tbody tr:nth-child(even){
