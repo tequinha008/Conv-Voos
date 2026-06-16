@@ -167,6 +167,7 @@ const aeroportos = {
   VLC: "Valencia",
   SVQ: "Sevilla - Espanha",
   BOD: "Bordeaux - França",
+  PSA: "Pisa",
   
   // --- Oriente Médio / África ---
   IST: "Istanbul",
