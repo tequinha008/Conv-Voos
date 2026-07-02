@@ -118,6 +118,7 @@ const aeroportos = {
   SJO: "San José",
   PTY: "Panama City – Tocumen",
   BIL: "Billings - Montana",
+  VLN: "Valencia - Venezuela",
   
   // --- Europa ---
   MAD: "Madrid",
