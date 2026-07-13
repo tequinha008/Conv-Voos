@@ -39,6 +39,7 @@ function prepararLinhas(texto) {
     if (
       linha.startsWith("•") ||
       linha.includes("GRUPO") ||
+      /^GRUPO\b/i.test(linha) ||
       linha.includes("OPERADO POR") ||
       linha.includes("CONSULTE") ||
       linha.includes("LATAM AIRLINES BRASIL") ||
