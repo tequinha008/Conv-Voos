@@ -197,6 +197,9 @@ const aeroportos = {
   PKX: "Beijing – Daxing",
   SZX: "Shenzhen",
   BOM: "Mumbai - Índia",
+  GZP: "Gazipasa - Turquia",
+  DNZ: "Denizli - Turquia",
+  HGH: "Hangzhou - China",
   
 
 
