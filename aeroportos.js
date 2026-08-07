@@ -24,6 +24,7 @@ const aeroportos = {
   GYN: "Goiânia",
   JJD: "Jericoacoara",
   MGF: "Maringa",
+  XAP: "Xapexó",
 
   // --- EUA (hubs + destinos comuns) ---
   JFK: "New York – JFK",
@@ -200,6 +201,10 @@ const aeroportos = {
   GZP: "Gazipasa - Turquia",
   DNZ: "Denizli - Turquia",
   HGH: "Hangzhou - China",
+  JRO: "Kilimanjaro",
+  ZNZ: "Zanzibar",
+  DMK: "Bangkok"
+  
   
 
 
