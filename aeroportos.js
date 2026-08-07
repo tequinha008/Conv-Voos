@@ -203,7 +203,7 @@ const aeroportos = {
   HGH: "Hangzhou - China",
   JRO: "Kilimanjaro",
   ZNZ: "Zanzibar",
-  DMK: "Bangkok"
+  DMK: "Bangkok",
   
   
 
