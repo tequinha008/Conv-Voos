@@ -3,16 +3,27 @@ window.dadosBanco = {
   companhias: {}
 };
 
-const CACHE_DADOS = "conversor-voos-dados-v4";
+const CACHE_DADOS = "conversor-voos-dados-v5";
 let carregamentoDados = null;
+
+function normalizarComparacao(valor) {
+  return String(valor || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/gi, "")
+    .toLowerCase();
+}
 
 function nomeCurtoAeroporto(item) {
   const cidade = String(item.cidade || "").trim();
   let nome = String(item.nome || item.codigo_iata || "").trim();
 
   if (cidade) {
-    const cidadeSegura = cidade.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    nome = nome.replace(new RegExp(`^${cidadeSegura}\\s*[–—-]\\s*`, "i"), "");
+    const partes = nome.split(/\s*[–—-]\s*/);
+
+    if (partes.length > 1 && normalizarComparacao(partes[0]) === normalizarComparacao(cidade)) {
+      nome = partes.slice(1).join(" – ");
+    }
   }
 
   nome = nome
@@ -23,7 +34,7 @@ function nomeCurtoAeroporto(item) {
     .trim();
 
   if (!cidade) return nome || item.codigo_iata;
-  if (!nome || nome.toLocaleLowerCase() === cidade.toLocaleLowerCase()) return cidade;
+  if (!nome || normalizarComparacao(nome) === normalizarComparacao(cidade)) return cidade;
 
   return `${cidade} – ${nome}`;
 }
