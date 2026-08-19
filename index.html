@@ -48,6 +48,14 @@ body{
   margin-bottom: 16px;
 }
 
+.topbar-principal{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex:1;
+  gap:18px;
+}
+
 .brand{
   display:flex;
   align-items:center;
@@ -96,6 +104,54 @@ body{
   color: var(--primary);
   font-size: 12px;
   white-space: nowrap;
+}
+
+.codigo-area{ min-width:290px; }
+
+.codigo-linha{
+  display:flex;
+  gap:7px;
+  align-items:center;
+}
+
+.codigo-input{
+  width:118px;
+  height:36px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:0 10px;
+  text-transform:uppercase;
+  background:#fff;
+  color:var(--text);
+  outline:none;
+}
+
+.codigo-input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(37,99,235,.12);
+}
+
+.codigo-ajuda{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:11px;
+}
+
+.codigo-status{
+  min-height:16px;
+  margin:4px 0 0;
+  font-size:11px;
+  color:var(--secondary);
+}
+
+@media (max-width:760px){
+  .topbar, .topbar-principal{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .codigo-area{ min-width:0; width:100%; }
+  .badge{ display:none; }
 }
 
 /* ===== CARD ===== */
@@ -208,6 +264,8 @@ textarea:focus{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
   margin-bottom: 8px;
 }
 
@@ -215,6 +273,43 @@ textarea:focus{
   margin:0;
   font-size: 13px;
   color: var(--primary);
+}
+
+.idioma-area{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.idioma-botoes{
+  display:flex;
+  padding:3px;
+  gap:3px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:var(--row-alt);
+}
+
+.btn-idioma{
+  border:0;
+  border-radius:9px;
+  padding:7px 11px;
+  background:transparent;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.btn-idioma.ativo{
+  background:#fff;
+  color:var(--secondary);
+  box-shadow:0 2px 7px rgba(15,23,42,.12);
+}
+
+.saida-idioma[hidden]{
+  display:none;
 }
 
 /* ===== TABELA ===== */
@@ -288,17 +383,27 @@ textarea:focus{
       <div class="brand">
         <div class="logo-emoji">✈️</div>
         <div class="brand-text">
-          <h1>CONVERSOR DE VOOS OFFLINE</h1>
+          <h1>CONVERSOR DE VOOS</h1>
           <p class="subtitle">FORMATO SABRE E AMADEUS</p>
         </div>
       </div>
-      <div class="badge">Decodifique seus voos em formato de tabela</div>
+      <div class="topbar-principal">
+        <div class="codigo-area">
+          <form class="codigo-linha" onsubmit="adicionarCodigo(event)">
+            <input id="codigoAusente" class="codigo-input" maxlength="3" autocomplete="off" aria-label="Código IATA ausente" placeholder="JFK ou G3">
+            <button id="btnAdicionarCodigo" class="btn btn-primary" type="submit" style="padding:9px 13px; border-radius:10px;">Adicionar</button>
+          </form>
+          <p class="codigo-ajuda">Aeroporto ou cia aérea — buscamos o nome automaticamente.</p>
+          <p id="codigoStatus" class="codigo-status" aria-live="polite"></p>
+        </div>
+        <div class="badge">Decodifique seus voos em formato de tabela</div>
+      </div>
     </div>
 
     <div class="card">
       <div class="card-header">
         <strong style="color:var(--primary)">Cole seus trechos abaixo</strong>
-        <p class="hint">Após converter, use os botões para copiar a tabela em Português ou Inglês.</p>
+        <p class="hint">Após converter, escolha se deseja visualizar a tabela em Português, Inglês ou Espanhol.</p>
       </div>
 
       <div class="main">
@@ -306,47 +411,28 @@ textarea:focus{
 
         <div class="actions">
           <button class="btn btn-primary" onclick="converter()">Decodificar</button>
-
-          <div id="acoes" style="display:none;">
-            <button class="btn btn-ghost" onclick="copiarTabelaEmail('PT')">Copiar em português</button>
-            <button class="btn btn-ghost" onclick="copiarTabelaEmail('EN')">Copiar em inglês</button>
-          </div>
         </div>
 
         <div class="sep"></div>
 
-        <div class="panel">
+        <div id="painelResultado" class="panel" style="display:none;">
           <div class="panel-title">
-            <h3 id="tituloPT" style="display:none;">Português</h3>
+            <div class="idioma-area">
+              <div class="idioma-botoes" role="group" aria-label="Idioma da tabela">
+                <button id="idiomaPT" class="btn-idioma ativo" onclick="mostrarIdioma('PT')">Português</button>
+                <button id="idiomaEN" class="btn-idioma" onclick="mostrarIdioma('EN')">Inglês</button>
+                <button id="idiomaES" class="btn-idioma" onclick="mostrarIdioma('ES')">Espanhol</button>
+              </div>
+            </div>
 
-            <button
-              id="btnCopiarPT"
-              class="btn btn-primary"
-              style="display:none; padding:8px 14px; font-size:13px;"
-              onclick="copiarTabelaEmail('PT')"
-            >
-              Copiar em português
+            <button id="btnCopiarAtual" class="btn btn-primary" style="padding:8px 14px; font-size:13px;" onclick="copiarTabelaAtual()">
+              Copiar tabela
             </button>
           </div>
 
-          <div id="saidaPT"></div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-title">
-            <h3 id="tituloEN" style="display:none;">Inglês</h3>
-
-            <button
-              id="btnCopiarEN"
-              class="btn btn-primary"
-              style="display:none; padding:8px 14px; font-size:13px;"
-              onclick="copiarTabelaEmail('EN')"
-            >
-              Copiar em inglês
-            </button>
-          </div>
-
-          <div id="saidaEN"></div>
+          <div id="saidaPT" class="saida-idioma"></div>
+          <div id="saidaEN" class="saida-idioma" hidden></div>
+          <div id="saidaES" class="saida-idioma" hidden></div>
         </div>
       </div>
     </div>
@@ -361,6 +447,8 @@ textarea:focus{
 
   <script src="aeroportos.js"></script>
   <script src="companhias.js"></script>
+  <script src="config.js"></script>
+  <script src="dados.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
