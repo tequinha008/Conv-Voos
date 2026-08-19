@@ -131,21 +131,40 @@ async function adicionarCodigo(evento) {
     if (!resposta.ok) throw new Error(resultado.erro || "Código não encontrado.");
 
     await atualizarDadosBanco();
-    status.textContent = `${resultado.codigo} — ${resultado.nome} adicionado com sucesso.`;
+    status.textContent = "";
+    if (typeof mostrarToast === "function") {
+      mostrarToast(`${resultado.codigo} adicionado com sucesso!`);
+    }
     input.value = "";
   } catch (erro) {
-    status.textContent = erro.message || "Não foi possível adicionar o código.";
+    status.textContent = "";
+    const mensagem = erro.message || "Não foi possível adicionar o código.";
+    if (typeof mostrarToast === "function") mostrarToast(mensagem);
   } finally {
     botao.disabled = false;
   }
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  const areaCodigo = document.querySelector(".codigo-area");
+
+  if (areaCodigo) {
+    const campos = [...areaCodigo.querySelectorAll("#codigoAusente")];
+    const botoes = [...areaCodigo.querySelectorAll('.codigo-linha button[type="submit"]')];
+    const ajudas = [...areaCodigo.querySelectorAll(".codigo-ajuda")];
+
+    campos.slice(0, -1).forEach(elemento => elemento.remove());
+    botoes.slice(0, -1).forEach(elemento => elemento.remove());
+    ajudas.forEach(elemento => elemento.remove());
+  }
+
   carregarCacheBanco();
   carregarDados();
 
   const input = document.getElementById("codigoAusente");
   input?.addEventListener("input", () => {
     input.value = input.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const status = document.getElementById("codigoStatus");
+    if (status) status.textContent = "";
   });
 });
