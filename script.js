@@ -1,4 +1,6 @@
-function converter() {
+async function converter() {
+  if (typeof carregarDados === "function") await carregarDados();
+
   const texto = document.getElementById("entrada").value;
   const linhas = prepararLinhas(texto);
   const voos = [];
@@ -16,11 +18,37 @@ function converter() {
   gerarTabelas(voos);
 
   const mostrar = voos.length > 0;
+  document.getElementById("painelResultado").style.display = mostrar ? "block" : "none";
 
-  document.getElementById("tituloPT").style.display = mostrar ? "block" : "none";
-  document.getElementById("tituloEN").style.display = mostrar ? "block" : "none";
-  document.getElementById("btnCopiarPT").style.display = mostrar ? "inline-block" : "none";
-  document.getElementById("btnCopiarEN").style.display = mostrar ? "inline-block" : "none";
+  if (mostrar) mostrarIdioma("PT");
+}
+
+let idiomaAtual = "PT";
+
+function mostrarIdioma(idioma) {
+  const idiomas = {
+    PT: "Português",
+    EN: "Inglês",
+    ES: "Espanhol"
+  };
+
+  if (!idiomas[idioma]) return;
+
+  idiomaAtual = idioma;
+
+  for (const codigo of Object.keys(idiomas)) {
+    const saida = document.getElementById(`saida${codigo}`);
+    const botao = document.getElementById(`idioma${codigo}`);
+    const selecionado = codigo === idioma;
+
+    if (saida) saida.hidden = !selecionado;
+
+    if (botao) {
+      botao.classList.toggle("ativo", selecionado);
+      botao.setAttribute("aria-pressed", String(selecionado));
+    }
+  }
+
 }
 
 /* ===== PREPARAR LINHAS ===== */
@@ -231,9 +259,9 @@ function processarAmadeus(linha) {
 function aeroportoB(sigla) {
   const s = (sigla || "").toUpperCase();
 
-  if (typeof aeroportos === "undefined") return s;
-
-  const nome = aeroportos[s];
+  const nomeBanco = window.dadosBanco?.aeroportos?.[s];
+  const nomeLocal = typeof aeroportos !== "undefined" ? aeroportos[s] : "";
+  const nome = nomeBanco || nomeLocal;
 
   return nome ? `${nome} (${s})` : s;
 }
@@ -241,19 +269,30 @@ function aeroportoB(sigla) {
 function nomeCompanhia(sigla) {
   const s = (sigla || "").toUpperCase();
 
-  if (typeof companhias === "undefined") return s;
+  const nomeBanco = window.dadosBanco?.companhias?.[s];
+  const nomeLocal = typeof companhias !== "undefined" ? companhias[s] : "";
 
-  return companhias[s] || s;
+  return nomeBanco || nomeLocal || s;
 }
 
-function formatarHora(h) {
+function formatarHora(h, idioma = "PT") {
   if (!h) return "";
 
   const s = String(h).replace(/\D/g, "");
 
   if (s.length !== 4) return h;
 
-  return s.slice(0, 2) + ":" + s.slice(2, 4);
+  const horas = Number(s.slice(0, 2));
+  const minutos = s.slice(2, 4);
+
+  if (idioma === "EN") {
+    const periodo = horas >= 12 ? "PM" : "AM";
+    const hora12 = horas % 12 || 12;
+    return `${hora12}:${minutos} ${periodo}`;
+  }
+
+  const hora24 = `${String(horas).padStart(2, "0")}:${minutos}`;
+  return idioma === "ES" ? `${hora24} h` : hora24;
 }
 
 function formatarDataPT(data) {
@@ -272,6 +311,30 @@ function formatarDataPT(data) {
     OCT: "OUT",
     NOV: "NOV",
     DEC: "DEZ"
+  };
+
+  const dia = data.substring(0, 2);
+  const mes = data.substring(2, 5).toUpperCase();
+
+  return dia + (mapaMes[mes] || mes);
+}
+
+function formatarDataES(data) {
+  if (!data) return "";
+
+  const mapaMes = {
+    JAN: "ENE",
+    FEB: "FEB",
+    MAR: "MAR",
+    APR: "ABR",
+    MAY: "MAY",
+    JUN: "JUN",
+    JUL: "JUL",
+    AUG: "AGO",
+    SEP: "SEP",
+    OCT: "OCT",
+    NOV: "NOV",
+    DEC: "DIC"
   };
 
   const dia = data.substring(0, 2);
@@ -321,8 +384,8 @@ function gerarTabelas(voos) {
   <td>${formatarDataPT(v.dataSaida)}</td>
   <td>${aeroportoB(v.origem)}</td>
   <td>${aeroportoB(v.destino)}</td>
-  <td>${formatarHora(v.horaSaida)}</td>
-  <td>${formatarHora(v.horaChegada)}</td>
+  <td>${formatarHora(v.horaSaida, "PT")}</td>
+  <td>${formatarHora(v.horaChegada, "PT")}</td>
   <td>${formatarDataPT(v.dataChegada)}</td>
 </tr>
 `;
@@ -354,8 +417,8 @@ function gerarTabelas(voos) {
   <td>${v.dataSaida}</td>
   <td>${aeroportoB(v.origem)}</td>
   <td>${aeroportoB(v.destino)}</td>
-  <td>${formatarHora(v.horaSaida)}</td>
-  <td>${formatarHora(v.horaChegada)}</td>
+  <td>${formatarHora(v.horaSaida, "EN")}</td>
+  <td>${formatarHora(v.horaChegada, "EN")}</td>
   <td>${v.dataChegada}</td>
 </tr>
 `;
@@ -363,12 +426,50 @@ function gerarTabelas(voos) {
 
   htmlEN += `</tbody></table>`;
   document.getElementById("saidaEN").innerHTML = htmlEN;
+
+  let htmlES = `
+<table class="tabela-voos">
+<tr>
+  <th>Aerolínea</th>
+  <th>Vuelo</th>
+  <th>Fecha</th>
+  <th>Origen</th>
+  <th>Destino</th>
+  <th>Hora de salida</th>
+  <th>Hora de llegada</th>
+  <th>Fecha de llegada</th>
+</tr>
+<tbody>
+`;
+
+  for (const v of voos) {
+    htmlES += `
+<tr>
+  <td>${nomeCompanhia(v.companhia)}</td>
+  <td>${v.voo}</td>
+  <td>${formatarDataES(v.dataSaida)}</td>
+  <td>${aeroportoB(v.origem)}</td>
+  <td>${aeroportoB(v.destino)}</td>
+  <td>${formatarHora(v.horaSaida, "ES")}</td>
+  <td>${formatarHora(v.horaChegada, "ES")}</td>
+  <td>${formatarDataES(v.dataChegada)}</td>
+</tr>
+`;
+  }
+
+  htmlES += `</tbody></table>`;
+  document.getElementById("saidaES").innerHTML = htmlES;
 }
 
 /* ===== COPIAR TABELA ===== */
 
 function copiarTabelaEmail(idioma) {
-  const selector = idioma === "EN" ? "#saidaEN table" : "#saidaPT table";
+  const seletores = {
+    PT: "#saidaPT table",
+    EN: "#saidaEN table",
+    ES: "#saidaES table"
+  };
+  const selector = seletores[idioma] || seletores.PT;
   const tabela = document.querySelector(selector);
 
   if (!tabela) {
@@ -377,6 +478,10 @@ function copiarTabelaEmail(idioma) {
   }
 
   copiarTabelaDireta(tabela);
+}
+
+function copiarTabelaAtual() {
+  copiarTabelaEmail(idiomaAtual);
 }
 
 function copiarTabelaDireta(tabela) {
@@ -510,6 +615,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const tabelaPT = elemento.closest("#saidaPT table");
     const tabelaEN = elemento.closest("#saidaEN table");
+    const tabelaES = elemento.closest("#saidaES table");
 
     if (tabelaPT) {
       e.preventDefault();
@@ -520,6 +626,12 @@ window.addEventListener("DOMContentLoaded", () => {
     if (tabelaEN) {
       e.preventDefault();
       copiarTabelaDireta(tabelaEN);
+      return;
+    }
+
+    if (tabelaES) {
+      e.preventDefault();
+      copiarTabelaDireta(tabelaES);
     }
   });
 });
