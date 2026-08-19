@@ -3,14 +3,36 @@ window.dadosBanco = {
   companhias: {}
 };
 
-const CACHE_DADOS = "conversor-voos-dados-v3";
+const CACHE_DADOS = "conversor-voos-dados-v4";
 let carregamentoDados = null;
+
+function nomeCurtoAeroporto(item) {
+  const cidade = String(item.cidade || "").trim();
+  let nome = String(item.nome || item.codigo_iata || "").trim();
+
+  if (cidade) {
+    const cidadeSegura = cidade.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    nome = nome.replace(new RegExp(`^${cidadeSegura}\\s*[–—-]\\s*`, "i"), "");
+  }
+
+  nome = nome
+    .replace(/\b(international|internacional|intl\.?|airport|aeroporto|regional|municipal)\b/gi, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+[–—-]\s*$/g, "")
+    .replace(/^[–—-]\s*/g, "")
+    .trim();
+
+  if (!cidade) return nome || item.codigo_iata;
+  if (!nome || nome.toLocaleLowerCase() === cidade.toLocaleLowerCase()) return cidade;
+
+  return `${cidade} – ${nome}`;
+}
 
 function aplicarDadosBanco(dados) {
   window.dadosBanco.aeroportos = Object.fromEntries(
     (dados.aeroportos || []).map(item => [
       item.codigo_iata,
-      item.nome_personalizado || item.cidade || item.nome
+      item.nome_personalizado || nomeCurtoAeroporto(item)
     ])
   );
 
