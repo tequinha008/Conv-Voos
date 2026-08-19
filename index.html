@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Decodificador de Voos</title>
 <link rel="icon" type="image/png" href="favicon.png">
-
 <style>
 :root{
   --bg-start:#f7f9fc;
@@ -19,9 +18,7 @@
   --border:#e5e7eb;
   --row-alt:#f3f4f6;
 }
-
 *{ box-sizing:border-box; }
-
 body{
   margin:0;
   min-height:100vh;
@@ -33,12 +30,10 @@ body{
   color:var(--text);
   padding: 28px 18px;
 }
-
 .container{
   max-width: 1100px;
   margin: 0 auto;
 }
-
 /* ===== TOPO ===== */
 .topbar{
   display:flex;
@@ -47,7 +42,6 @@ body{
   gap:16px;
   margin-bottom: 16px;
 }
-
 .topbar-principal{
   display:flex;
   align-items:center;
@@ -55,13 +49,11 @@ body{
   flex:1;
   gap:18px;
 }
-
 .brand{
   display:flex;
   align-items:center;
   gap:14px;
 }
-
 .logo-emoji{
   width: 48px;
   height: 48px;
@@ -78,14 +70,12 @@ body{
   box-shadow: 0 6px 14px rgba(30,58,138,.18);
   font-size: 22px;
 }
-
 .brand-text h1{
   margin: 0;
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
-
 .brand-text .subtitle{
   margin: 4px 0 0 0;
   font-size: 12px;
@@ -94,7 +84,6 @@ body{
   color: var(--secondary);
   text-transform: uppercase;
 }
-
 .badge{
   padding: 8px 12px;
   border-radius: 999px;
@@ -105,65 +94,76 @@ body{
   font-size: 12px;
   white-space: nowrap;
 }
-
 .codigo-area{
   width:205px;
+  width:235px;
   padding:0;
   border:0;
   background:transparent;
   box-shadow:none;
 }
-
 .codigo-linha{
   display:flex;
   gap:5px;
+  gap:2px;
   align-items:center;
+  padding:3px;
+  border:1px solid rgba(64,43,98,.16);
+  border-radius:999px;
+  background:rgba(255,255,255,.42);
+  box-shadow:0 5px 14px rgba(30,58,138,.08);
 }
-
 .codigo-input{
   width:92px;
   height:30px;
   border:1px solid rgba(64,43,98,.20);
   border-radius:8px;
   padding:0 8px;
+  flex:1;
+  min-width:0;
+  height:29px;
+  border:0;
+  border-radius:999px;
+  padding:0 10px;
   text-transform:uppercase;
   background:rgba(255,255,255,.38);
+  background:transparent;
   color:var(--text);
   font-size:12px;
+  font-size:11px;
   outline:none;
 }
-
 .codigo-input:focus{
   border-color:var(--accent);
   box-shadow:0 0 0 3px rgba(37,99,235,.12);
+  box-shadow:none;
 }
-
+.codigo-input::placeholder{
+  color:#334155;
+  opacity:1;
+  font-weight:600;
+}
 .codigo-ajuda{
   margin:4px 0 0;
   color:var(--muted);
   font-size:9.5px;
   white-space:nowrap;
 }
-
 .codigo-status{
   min-height:0;
   margin:3px 0 0;
   font-size:10px;
   color:var(--secondary);
 }
-
 .codigo-status:empty{ display:none; }
-
 @media (max-width:760px){
   .topbar, .topbar-principal{
     align-items:flex-start;
     flex-direction:column;
   }
-
   .codigo-area{ min-width:0; width:100%; }
   .badge{ display:none; }
 }
-
 /* ===== CARD ===== */
 .card{
   background: rgba(255,255,255,.95);
@@ -172,22 +172,18 @@ body{
   box-shadow: 0 16px 40px rgba(2,6,23,.10);
   overflow:hidden;
 }
-
 .card-header{
   padding: 16px;
   border-bottom: 1px solid var(--border);
 }
-
 .card-header .hint{
   margin: 6px 0 0 0;
   color: var(--muted);
   font-size: 13px;
 }
-
 .main{
   padding: 16px;
 }
-
 /* ===== INPUT ===== */
 textarea{
   width:100%;
@@ -200,12 +196,10 @@ textarea{
   font-size: 14px;
   resize: vertical;
 }
-
 textarea:focus{
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(37,99,235,.14);
 }
-
 /* ===== BOTÕES ===== */
 .actions{
   display:flex;
@@ -214,7 +208,6 @@ textarea:focus{
   margin-top: 12px;
   align-items:center;
 }
-
 .btn{
   border: 0;
   border-radius: 14px;
@@ -223,45 +216,37 @@ textarea:focus{
   cursor: pointer;
   transition: transform .08s ease, opacity .08s ease;
 }
-
 .btn-primary{
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: #fff;
   box-shadow: 0 10px 22px rgba(109,40,217,.18);
 }
-
 .btn-ghost{
   background: #fff;
   border: 1px solid var(--border);
   color: var(--primary);
 }
-
 .btn:hover{
   transform: translateY(-1px);
   opacity: .96;
 }
-
 .sep{
   height:1px;
   background: var(--border);
   margin: 16px 0;
 }
-
 /* ===== PAINÉIS ===== */
 .grid{
   display: block;
 }
-
 .grid > *{
   margin-bottom: 16px;
 }
-
 @media (min-width: 980px){
   .grid{
     grid-template-columns: 1fr 1fr;
   }
 }
-
 .panel{
   background: #fff;
   border: 1px solid var(--border);
@@ -269,7 +254,6 @@ textarea:focus{
   padding: 12px;
   overflow-x:hidden;
 }
-
 .panel-title{
   display:flex;
   align-items:center;
@@ -278,20 +262,17 @@ textarea:focus{
   gap:10px;
   margin-bottom: 8px;
 }
-
 .panel-title h3{
   margin:0;
   font-size: 13px;
   color: var(--primary);
 }
-
 .idioma-area{
   display:flex;
   align-items:center;
   flex-wrap:wrap;
   gap:8px;
 }
-
 .idioma-botoes{
   display:flex;
   padding:3px;
@@ -300,7 +281,6 @@ textarea:focus{
   border-radius:12px;
   background:var(--row-alt);
 }
-
 .btn-idioma{
   border:0;
   border-radius:9px;
@@ -311,17 +291,14 @@ textarea:focus{
   font-weight:600;
   cursor:pointer;
 }
-
 .btn-idioma.ativo{
   background:#fff;
   color:var(--secondary);
   box-shadow:0 2px 7px rgba(15,23,42,.12);
 }
-
 .saida-idioma[hidden]{
   display:none;
 }
-
 /* ===== TABELA ===== */
 .tabela-voos{
   width: 100%;
@@ -331,7 +308,6 @@ textarea:focus{
   border-radius: 12px;
   overflow: hidden;
 }
-
 .tabela-voos th, .tabela-voos td{
   padding: 8px 6px;
   font-size: 12px;
@@ -341,7 +317,6 @@ textarea:focus{
   overflow-wrap: anywhere;
   line-height: 1.3;
 }
-
 .tabela-voos th:nth-child(1){ width:12%; }
 .tabela-voos th:nth-child(2){ width:6%; }
 .tabela-voos th:nth-child(3){ width:7%; }
@@ -350,37 +325,30 @@ textarea:focus{
 .tabela-voos th:nth-child(6){ width:11%; }
 .tabela-voos th:nth-child(7){ width:11%; }
 .tabela-voos th:nth-child(8){ width:11%; }
-
 @media (max-width:760px){
   .panel{ padding:7px; }
-
   .tabela-voos th, .tabela-voos td{
     padding:6px 3px;
     font-size:9px;
   }
 }
-
 .tabela-voos th{
   background: var(--primary);
   color: #fff;
   font-weight: 700;
 }
-
 .tabela-voos td{
   color: #1e3a8a;
 }
-
 .tabela-voos tbody tr:nth-child(even){
   background: var(--row-alt);
 }
-
 .footer{
   margin-top: 14px;
   color: var(--muted);
   font-size: 12px;
   text-align: center;
 }
-
 /* ===== TOAST ===== */
 .toast{
   position: fixed;
@@ -399,17 +367,14 @@ textarea:focus{
   pointer-events: none;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
-
 .toast.show{
   opacity: 1;
   transform: translateY(0);
 }
 </style>
 </head>
-
 <body>
   <div class="container">
-
     <div class="topbar">
       <div class="brand">
         <div class="logo-emoji">✈️</div>
@@ -423,28 +388,26 @@ textarea:focus{
           <form class="codigo-linha" onsubmit="adicionarCodigo(event)">
             <input id="codigoAusente" class="codigo-input" maxlength="3" autocomplete="off" aria-label="Código IATA ausente" placeholder="JFK ou G3">
             <button id="btnAdicionarCodigo" class="btn btn-primary" type="submit" style="height:30px; padding:0 10px; border-radius:8px; font-size:11px;">Adicionar</button>
+            <input id="codigoAusente" class="codigo-input" maxlength="3" autocomplete="off" aria-label="Código IATA ausente" placeholder="CÓDIGO: JFK OU G3">
+            <button id="btnAdicionarCodigo" class="btn btn-primary" type="submit" style="height:29px; padding:0 12px; border-radius:999px; font-size:10px; box-shadow:none;">Adicionar</button>
           </form>
           <p class="codigo-ajuda">Aeroporto ou cia — busca automática.</p>
           <p id="codigoStatus" class="codigo-status" aria-live="polite"></p>
         </div>
       </div>
     </div>
-
     <div class="card">
       <div class="card-header">
         <strong style="color:var(--primary)">Cole seus trechos abaixo</strong>
         <p class="hint">Após converter, escolha se deseja visualizar a tabela em Português, Inglês ou Espanhol.</p>
       </div>
-
       <div class="main">
         <textarea id="entrada" placeholder="COLE OS TRECHOS AQUI"></textarea>
-
         <div class="actions">
           <button class="btn btn-primary" onclick="converter()">Decodificar</button>
+          <button class="btn btn-primary" style="padding:8px 14px; font-size:13px;" onclick="converter()">Decodificar</button>
         </div>
-
         <div class="sep"></div>
-
         <div id="painelResultado" class="panel" style="display:none;">
           <div class="panel-title">
             <div class="idioma-area">
@@ -454,27 +417,21 @@ textarea:focus{
                 <button id="idiomaES" class="btn-idioma" onclick="mostrarIdioma('ES')">Espanhol</button>
               </div>
             </div>
-
             <button id="btnCopiarAtual" class="btn btn-primary" style="padding:8px 14px; font-size:13px;" onclick="copiarTabelaAtual()">
               Copiar tabela
             </button>
           </div>
-
           <div id="saidaPT" class="saida-idioma"></div>
           <div id="saidaEN" class="saida-idioma" hidden></div>
           <div id="saidaES" class="saida-idioma" hidden></div>
         </div>
       </div>
     </div>
-
     <div class="footer">
       O decodificador ainda está em desenvolvimento e pode apresentar falhas e/ou não ler todos os aeroportos e cias aéreas. Se isso acontecer, comunique a equipe de criação ✈️💁🏻‍♀️
     </div>
-
   </div>
-
   <div id="toast" class="toast"></div>
-
   <script src="aeroportos.js"></script>
   <script src="companhias.js"></script>
   <script src="config.js"></script>
