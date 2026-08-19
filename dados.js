@@ -3,14 +3,14 @@ window.dadosBanco = {
   companhias: {}
 };
 
-const CACHE_DADOS = "conversor-voos-dados-v2";
+const CACHE_DADOS = "conversor-voos-dados-v3";
 let carregamentoDados = null;
 
 function aplicarDadosBanco(dados) {
   window.dadosBanco.aeroportos = Object.fromEntries(
     (dados.aeroportos || []).map(item => [
       item.codigo_iata,
-      item.nome_personalizado || item.nome
+      item.nome_personalizado || item.cidade || item.nome
     ])
   );
 
@@ -33,14 +33,14 @@ function carregarCacheBanco() {
   }
 }
 
-async function buscarTabelaBanco(nomeTabela) {
+async function buscarTabelaBanco(nomeTabela, colunas) {
   const config = window.APP_CONFIG || {};
   const registros = [];
   const tamanhoPagina = 1000;
 
   for (let inicio = 0; ; inicio += tamanhoPagina) {
     const url = new URL(`${config.supabaseUrl}/rest/v1/${nomeTabela}`);
-    url.searchParams.set("select", "codigo_iata,nome,nome_personalizado");
+    url.searchParams.set("select", colunas);
     url.searchParams.set("ativo", "eq.true");
     url.searchParams.set("order", "codigo_iata.asc");
 
@@ -63,8 +63,8 @@ async function buscarTabelaBanco(nomeTabela) {
 
 async function atualizarDadosBanco() {
   const [aeroportosBanco, companhiasBanco] = await Promise.all([
-    buscarTabelaBanco("aeroportos"),
-    buscarTabelaBanco("companhias")
+    buscarTabelaBanco("aeroportos", "codigo_iata,nome,nome_personalizado,cidade"),
+    buscarTabelaBanco("companhias", "codigo_iata,nome,nome_personalizado")
   ]);
 
   const dados = {
