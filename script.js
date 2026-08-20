@@ -1,5 +1,5 @@
 async function converter() {
-  if (typeof carregarDados === "function") await carregarDados();
+  if (typeof carregarDados === "function") carregarDados();
 
   const texto = document.getElementById("entrada").value;
   const linhas = prepararLinhas(texto);
