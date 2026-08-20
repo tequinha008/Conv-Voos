@@ -5,6 +5,7 @@ window.dadosBanco = {
 
 const CACHE_DADOS = "conversor-voos-dados-v5";
 let carregamentoDados = null;
+let dadosCarregados = false;
 
 function normalizarComparacao(valor) {
   return String(valor || "")
@@ -53,6 +54,8 @@ function aplicarDadosBanco(dados) {
       item.nome_personalizado || item.nome
     ])
   );
+
+  dadosCarregados = true;
 }
 
 function carregarCacheBanco() {
@@ -111,6 +114,7 @@ async function atualizarDadosBanco() {
 }
 
 async function carregarDados() {
+  if (dadosCarregados) return;
   if (carregamentoDados) return carregamentoDados;
 
   carregamentoDados = (async () => {
