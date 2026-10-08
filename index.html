@@ -296,6 +296,13 @@ textarea:focus{
   color: var(--primary);
 }
 
+.acoes-resultado{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+}
+
 .idioma-area{
   display:flex;
   align-items:center;
@@ -465,9 +472,14 @@ textarea:focus{
               </div>
             </div>
 
-            <button id="btnCopiarAtual" class="btn btn-primary" style="padding:8px 14px; font-size:13px;" onclick="copiarTabelaAtual()">
-              Copiar tabela
-            </button>
+            <div class="acoes-resultado">
+              <button id="btnCopiarFoto" class="btn btn-ghost" style="padding:8px 14px; font-size:13px;" onclick="copiarTabelaComoFoto()">
+                Copiar como foto
+              </button>
+              <button id="btnCopiarAtual" class="btn btn-primary" style="padding:8px 14px; font-size:13px;" onclick="copiarTabelaAtual()">
+                Copiar tabela
+              </button>
+            </div>
           </div>
 
           <div id="saidaPT" class="saida-idioma"></div>
