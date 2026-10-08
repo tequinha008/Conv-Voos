@@ -484,6 +484,135 @@ function copiarTabelaAtual() {
   copiarTabelaEmail(idiomaAtual);
 }
 
+function quebrarTextoCanvas(contexto, texto, larguraMaxima) {
+  const palavras = String(texto || "").trim().split(/\s+/).filter(Boolean);
+  const linhas = [];
+  let linha = "";
+
+  for (const palavra of palavras) {
+    const teste = linha ? `${linha} ${palavra}` : palavra;
+
+    if (linha && contexto.measureText(teste).width > larguraMaxima) {
+      linhas.push(linha);
+      linha = palavra;
+    } else {
+      linha = teste;
+    }
+  }
+
+  if (linha) linhas.push(linha);
+  return linhas.length ? linhas : [""];
+}
+
+function corVisivel(elemento, propriedade, padrao) {
+  const cor = getComputedStyle(elemento)[propriedade];
+
+  if (!cor || cor === "transparent" || cor === "rgba(0, 0, 0, 0)") {
+    return padrao;
+  }
+
+  return cor;
+}
+
+function tabelaParaCanvas(tabela) {
+  const retanguloTabela = tabela.getBoundingClientRect();
+  const escala = 2;
+  const canvas = document.createElement("canvas");
+  const largura = Math.ceil(retanguloTabela.width);
+  const altura = Math.ceil(retanguloTabela.height);
+
+  canvas.width = largura * escala;
+  canvas.height = altura * escala;
+
+  const contexto = canvas.getContext("2d");
+  contexto.scale(escala, escala);
+  contexto.fillStyle = "#ffffff";
+  contexto.fillRect(0, 0, largura, altura);
+
+  for (const celula of tabela.querySelectorAll("th, td")) {
+    const retangulo = celula.getBoundingClientRect();
+    const x = retangulo.left - retanguloTabela.left;
+    const y = retangulo.top - retanguloTabela.top;
+    const estilo = getComputedStyle(celula);
+    const fundoLinha = corVisivel(celula.parentElement, "backgroundColor", "#ffffff");
+
+    contexto.fillStyle = corVisivel(celula, "backgroundColor", fundoLinha);
+    contexto.fillRect(x, y, retangulo.width, retangulo.height);
+
+    contexto.strokeStyle = "#e5e7eb";
+    contexto.lineWidth = 1;
+    contexto.strokeRect(x + 0.5, y + 0.5, retangulo.width - 1, retangulo.height - 1);
+
+    const tamanhoFonte = parseFloat(estilo.fontSize) || 12;
+    const pesoFonte = estilo.fontWeight === "700" || Number(estilo.fontWeight) >= 600 ? "700" : "400";
+    contexto.font = `${pesoFonte} ${tamanhoFonte}px Segoe UI, Arial, sans-serif`;
+    contexto.fillStyle = corVisivel(celula, "color", "#0f172a");
+    contexto.textAlign = "center";
+    contexto.textBaseline = "middle";
+
+    const linhas = quebrarTextoCanvas(contexto, celula.textContent, Math.max(10, retangulo.width - 12));
+    const alturaLinha = tamanhoFonte * 1.3;
+    const inicioY = y + retangulo.height / 2 - ((linhas.length - 1) * alturaLinha) / 2;
+
+    linhas.forEach((linha, indice) => {
+      contexto.fillText(linha, x + retangulo.width / 2, inicioY + indice * alturaLinha);
+    });
+  }
+
+  return canvas;
+}
+
+function canvasParaBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(blob => {
+      if (blob) resolve(blob);
+      else reject(new Error("Não foi possível gerar a imagem."));
+    }, "image/png");
+  });
+}
+
+function baixarImagem(blob) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `voos-${idiomaAtual.toLowerCase()}.png`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+async function copiarTabelaComoFoto() {
+  const tabela = document.querySelector(`#saida${idiomaAtual} table`);
+
+  if (!tabela) {
+    mostrarToast("Gere a tabela primeiro.");
+    return;
+  }
+
+  try {
+    const canvas = tabelaParaCanvas(tabela);
+    const blob = await canvasParaBlob(canvas);
+
+    if (navigator.clipboard?.write && window.ClipboardItem) {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ "image/png": blob })
+        ]);
+        mostrarToast("Foto da tabela copiada!");
+        return;
+      } catch {
+        // Alguns navegadores permitem gerar a imagem, mas não copiá-la.
+      }
+    }
+
+    baixarImagem(blob);
+    mostrarToast("Foto da tabela baixada!");
+  } catch {
+    mostrarToast("Não foi possível gerar a foto.");
+  }
+}
+
 function copiarTabelaDireta(tabela) {
   if (!tabela) {
     mostrarToast("Nenhuma tabela para copiar.");
